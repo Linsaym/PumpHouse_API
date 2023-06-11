@@ -8,7 +8,30 @@ class ResidentsController extends Controller
 {
     public function index()
     {
-        return Residents::all();
+        $query = Residents::all();
+        if ($query->count()>1){
+            return $query;
+        }else{
+            $resident = new Residents;
+            $resident->fio='Добавьте нового пользователя';
+            $resident->area=0;
+            $resident->start_date='2000-01-01';
+            $result = $resident->save();
+            if ($result){return $resident;}
+            else{
+                return 'error';
+            }
+            $resident = new Residents;
+            $resident->fio='Иванов Иван Иванович';
+            $resident->area=0;
+            $resident->start_date='2000-01-01';
+            $result = $resident->save();
+            if ($result){return $resident;}
+            else{
+                return 'error';
+            }
+            return Residents::all();
+        }
     }
     public function addResident(Request $request)
     {
