@@ -8,20 +8,14 @@ use Illuminate\Http\Request;
 
 class PeriodsController extends Controller
 {
-    public function index()
-    {
-        return Periods::all();
-    }
     public function getYears($year)
     {
 
 
         //Возвращает два года, текущий и предыдущий
         $thisYear = Periods::where('year', $year)->get();
-        $prevYear = Periods::where('year', intval($year)-1)->get();
-        if ($thisYear->count()>1 && $prevYear->count()>1){
-            $response = $thisYear->merge($prevYear);
-            return response()->json($response);
+        if ($thisYear->count()>1){
+            return response()->json($thisYear);
         }else{
             $months = [
                 [0, 1, 50],
@@ -47,23 +41,40 @@ class PeriodsController extends Controller
                     $period->save();
                 }
             }
-            if($prevYear->count()<1){
-                foreach ($months as $month) {
-                    $period = new Periods();
-                    $period->year = $year-1;
-                    $period->month = $month[0];
-                    $period->indications = $month[1];
-                    $period->tariff = $month[2];
-                    $period->save();
-                }
-            }
+
 
             $thisYear = Periods::where('year', $year)->get();
-            $prevYear = Periods::where('year', intval($year)-1)->get();
-            if ($thisYear->count()>1 && $prevYear->count()>1) {
-                $response = $thisYear->merge($prevYear);
-                return response()->json($response);
+            if ($thisYear->count()>1) {
+                return response()->json($thisYear);
             }
+        }
+    }
+    public function updateTariff(Request $request, $year, $month)
+    {
+        $tariff = $request->input('tariff');
+
+        $period = Periods::where('year', $year)
+            ->where('month', $month)
+            ->update(['tariff' => $tariff]);
+
+        if ($period) {
+            return response()->json(['message' => 'Tariff updated successfully.']);
+        } else {
+            return response()->json(['message' => 'Period not found.'], 404);
+        }
+    }
+    public function updateIndications(Request $request, $year, $month)
+    {
+        $indications = $request->input('indications');
+
+        $period = Periods::where('year', $year)
+            ->where('month', $month)
+            ->update(['indications' => $indications]);
+
+        if ($period) {
+            return response()->json(['message' => 'Indications updated successfully.']);
+        } else {
+            return response()->json(['message' => 'Period not found.'], 404);
         }
     }
 }
