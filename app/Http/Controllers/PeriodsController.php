@@ -10,8 +10,6 @@ class PeriodsController extends Controller
 {
     public function getYears($year)
     {
-
-
         //Возвращает два года, текущий и предыдущий
         $thisYear = Periods::where('year', $year)->get();
         if ($thisYear->count()>1){
