@@ -45,4 +45,27 @@ class ResidentsController extends Controller
             return 'error';
         }
     }
+    public function deleteResident($id)
+    {
+        $resident = Residents::find($id);
+
+        if ($resident) {
+            $resident->delete();
+
+            return response()->json(['message' => 'Resident deleted successfully.']);
+        } else {
+            return response()->json(['message' => 'Resident not found.'], 404);
+        }
+    }
+    public function updateResident(Request $request, $id)
+    {
+        $resident = Residents::find($id);
+
+        if ($resident) {
+            $resident->update($request->all());
+            return response()->json(['message' => 'Resident updated successfully.']);
+        } else {
+            return response()->json(['message' => 'Resident not found.'], 404);
+        }
+    }
 }

@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/residents', [ResidentsController::class, 'index']);
 Route::post('/residents/create', [ResidentsController::class, 'addResident']);
+Route::delete('/residents/delete/{id}', [ResidentsController::class, 'deleteResident']);
+Route::patch('/residents/update/{id}', [ResidentsController::class, 'updateResident']);
 
 Route::get('/get_periods/{year}', [PeriodsController::class, 'getYears']);
 Route::put('/update_tariff/{year}/{month}', [PeriodsController::class, 'updateTariff']);
