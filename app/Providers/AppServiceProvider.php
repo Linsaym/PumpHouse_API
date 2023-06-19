@@ -2,7 +2,11 @@
 
 namespace App\Providers;
 
+use App\Observers\PeriodsObserver;
 use Illuminate\Support\ServiceProvider;
+use App\Observers\PumpMeterRecordObserver;
+use App\Models\Periods;
+
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +23,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Periods::observe(new PeriodsObserver());
     }
 }

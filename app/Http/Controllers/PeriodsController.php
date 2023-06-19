@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Periods;
+use Carbon\Carbon;
 use App\Models\Residents;
 use Illuminate\Http\Request;
 
@@ -10,43 +11,29 @@ class PeriodsController extends Controller
 {
     public function getYears($year)
     {
-        //Возвращает два года, текущий и предыдущий
-        $thisYear = Periods::where('year', $year)->get();
-        if ($thisYear->count()>1){
-            return response()->json($thisYear);
-        }else{
-            $months = [
-                [0, 0, 50],
-                [1, 0, 50],
-                [2, 0, 50],
-                [3, 0, 50],
-                [4, 0, 50],
-                [5, 0, 50],
-                [6, 0, 50],
-                [7, 0, 50],
-                [8, 0, 50],
-                [9, 0, 50],
-                [10, 0, 50],
-                [11, 0, 50]
-            ];
-            if ($thisYear->count()<1){
-                foreach ($months as $month) {
-                    $period = new Periods();
-                    $period->year = $year;
-                    $period->month = $month[0];
-                    $period->indications = $month[1];
-                    $period->tariff = $month[2];
-                    $period->save();
-                }
+        $periods = Periods::whereYear('begin_date', $year)
+            ->get();
+        if ($periods->count() < 11) {
+            $periods = [];
+            
+            for ($month = 1; $month <= 12; $month++) {
+                $beginDate = Carbon::create($year, $month, 1, 0, 0, 0)->startOfMonth();
+                $endDate = Carbon::create($year, $month, 1, 23, 59, 59)->endOfMonth();
+
+                $periods[] = [
+                    'begin_date' => $beginDate,
+                    'end_date' => $endDate,
+                ];
             }
 
-
-            $thisYear = Periods::where('year', $year)->get();
-            if ($thisYear->count()>1) {
-                return response()->json($thisYear);
-            }
+            // Вставляем записи в таблицу "periods"
+            Periods::insert($periods);
+            $periods = Periods::whereYear('begin_date', $year)
+                ->get();
         }
+        return response()->json($periods);
     }
+
     public function updateTariff(Request $request, $year, $month)
     {
         $tariff = $request->input('tariff');
@@ -61,6 +48,7 @@ class PeriodsController extends Controller
             return response()->json(['message' => 'Period not found.'], 404);
         }
     }
+
     public function updateIndications(Request $request, $year, $month)
     {
         $indications = $request->input('indications');
